@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.divesh.androidstorage.databinding.ActivityMainBinding
@@ -29,7 +30,16 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        photoAdapter = InternalPhotoAdapter()
+        photoAdapter = InternalPhotoAdapter(onLongClick = {
+               val isDeleted = deletePhotoFromStorage(it.fileName)
+
+            if (isDeleted){
+                loadPhotosInRecyclerView()
+                Toast.makeText(this,"Photo Deleted.",Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(this,"Failed to delete photo!.",Toast.LENGTH_SHORT).show()
+            }
+        })
 
         val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicturePreview()){
             val isPrivate = binding.switch1.isChecked
@@ -53,10 +63,21 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun deletePhotoFromStorage(filename: String): Boolean{
+
+        return try {
+                    deleteFile(filename)
+        }catch (e: IOException){
+            e.printStackTrace()
+            false
+        }
+    }
+
     private fun setUpRecyclerView(){
         binding.recyclerView.apply {
             adapter = photoAdapter
-            layoutManager = StaggeredGridLayoutManager(3,RecyclerView.VERTICAL)
+            layoutManager = GridLayoutManager(this@MainActivity,2)
+            //layoutManager = StaggeredGridLayoutManager(3,RecyclerView.VERTICAL)
         }
     }
 

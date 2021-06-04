@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.divesh.androidstorage.databinding.LayoutPhotoBinding
 
-class InternalPhotoAdapter : ListAdapter<PhotoModel,InternalPhotoAdapter.PhotoViewHolder>(Companion) {
+class InternalPhotoAdapter(
+    val onLongClick: (PhotoModel) -> Unit
+) : ListAdapter<PhotoModel,InternalPhotoAdapter.PhotoViewHolder>(Companion) {
 
 
 
@@ -24,11 +26,16 @@ class InternalPhotoAdapter : ListAdapter<PhotoModel,InternalPhotoAdapter.PhotoVi
         holder.photoBinding.apply {
                 imageView.setImageBitmap(photo.bmp)
 
-            val aspectRatio = photo.bmp.width.toFloat() / photo.bmp.height.toFloat()
+           /* val aspectRatio = photo.bmp.width.toFloat() / photo.bmp.height.toFloat()
             ConstraintSet().apply {
                 clone(root)
                 setDimensionRatio(imageView.id, aspectRatio.toString())
                 applyTo(root)
+            }*/
+
+            imageView.setOnLongClickListener {
+                onLongClick(photo)
+                true
             }
         }
     }
